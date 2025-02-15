@@ -25,9 +25,6 @@ const SelectRecentDoc = ({ options, setOptions }) => {
 
   useEffect(() => {
     fetchOptions();
-  }, []);
-
-  useEffect(() => {
     chrome.storage.sync.get("selectedDoc", (result) => {
       if (result?.selectedDoc) {
         setSelectedDoc(result?.selectedDoc);
@@ -35,15 +32,10 @@ const SelectRecentDoc = ({ options, setOptions }) => {
     });
   }, []);
 
-  const handleAddDocWithId = async () => {
-    if (!docId.trim()) {
-      return;
-    }
-
-    setIsLoading(true);
+  const fetchDocWithId = async (id) => {
     try {
       const res = await fetch(
-        `https://docs.googleapis.com/v1/documents/${docId}`,
+        `https://docs.googleapis.com/v1/documents/${id}`,
         {
           method: "GET",
           headers: {
@@ -52,6 +44,26 @@ const SelectRecentDoc = ({ options, setOptions }) => {
           },
         }
       );
+      return res;
+    } catch (error) {
+      throw error;
+    }
+  }
+    
+
+  const handleAddDocWithId = async () => {
+    if (!docId.trim()) {
+      return;
+    }
+
+    if ((options || []).find((option) => option.value === docId)) {
+      setErrorInfo({showError: true, message: "The document ID you entered already exists."});
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetchDocWithId(docId);
 
       if (!res.ok) {
         if (res.status === 404) {
@@ -91,9 +103,32 @@ const SelectRecentDoc = ({ options, setOptions }) => {
     }, 5000);
   }, [errorInfo.showError]);
 
-  const handleDropdownChange = (event) => {
+  const extractHeadings = (docData) => {
+    return docData?.body?.content
+      .filter((element) => element.paragraph?.paragraphStyle?.namedStyleType?.includes("HEADING"))
+      .map((element) => ({
+        text: element.paragraph.elements
+          ?.map((el) => el?.textRun?.content.trim())
+          ?.join(" "),
+        type: element?.paragraph?.paragraphStyle?.namedStyleType,
+        index: element?.startIndex,
+      }));
+  };
+
+  const handleDropdownChange = async (event) => {
     setSelectedDoc(event.target.value);
     chrome.storage.sync.set({ selectedDoc: event.target.value });
+
+    const res = await fetchDocWithId(event.target.value);
+    if (!res.ok) {
+      return;
+    }
+    const docData = await res.json();
+    const headings = extractHeadings(docData);
+    chrome.storage.local.set(
+      { selectedDocData: { docId: event.target.value, headings } },
+      () => {}
+    );
   };
 
   return (
@@ -119,10 +154,16 @@ const SelectRecentDoc = ({ options, setOptions }) => {
         showError={errorInfo.showError}
         helperText={
           <span>
-            Find it in the Google Doc URL between <code>/d/</code> and <code>/edit.</code> <br />
-            {errorInfo.showError ? errorInfo.message : null}
+            {errorInfo.showError ? (
+              errorInfo.message
+            ) : (
+              <span>
+                Find it in the Google Doc URL between <code>/d/</code> and <code>/edit</code>.
+              </span>
+            )}
           </span>
         }
+        
         value={docId}
         onChange={(event) => setDocId(event.target.value)}
         isLoading={isLoading}
