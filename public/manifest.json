@@ -6,6 +6,11 @@
   "action": {
     "default_popup": "index.html"
   },
+  "icons": {
+    "16": "logo.png",
+    "48": "logo.png",
+    "128": "logo.png"
+  },
   "permissions": ["storage", "identity", "scripting", "contextMenus"],
   "host_permissions": ["https://docs.google.com/document/*"],
   "background": {

@@ -24,7 +24,7 @@ const SelectRecentDoc = ({ options, setOptions, selectedDoc, setSelectedDoc }) =
 
   useEffect(() => {
     fetchOptions();
-    chrome.storage.sync.get("selectedDoc", (result) => {
+    chrome.storage.local.get("selectedDoc", (result) => {
       if (result?.selectedDoc) {
         setSelectedDoc(result?.selectedDoc);
       }

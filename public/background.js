@@ -14,7 +14,6 @@ function createOrUpdateContextMenu() {
   });
 }
 
-// Fetch token initially
 chrome.storage.local.get(["token"], (result) => {
   authToken = result.token || null;
 });
@@ -35,17 +34,32 @@ chrome.storage.local.get(["selectedDocData"], (data) => {
   }
 });
 
-// Listen for storage updates
+// Listen for selected document changes
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.selectedDocData) {
-    currentDocId = changes.selectedDocData.newValue?.docId;
-    docLastIndex = changes.selectedDocData.newValue?.docLastIndex;
+    currentDocId = changes.selectedDocData.newValue?.docId || null;
+    docLastIndex = changes.selectedDocData.newValue?.docLastIndex || 0;
     createOrUpdateContextMenu();
   }
 });
 
+// Function to fetch latest token before API call
+async function getAuthToken() {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(["token"], (result) => {
+      resolve(result.token || null);
+    });
+  });
+}
+
 async function insertTextInGoogleDoc(docId, text, docLastIndex) {
   try {
+    const latestToken = await getAuthToken();
+    if (!latestToken) {
+      console.error("No token found.");
+      return;
+    }
+
     const newText = `\n${text}`;
     const startIndex = docLastIndex;
     const endIndex = startIndex + newText.length;
@@ -74,17 +88,12 @@ async function insertTextInGoogleDoc(docId, text, docLastIndex) {
       ],
     };
 
-    if (!authToken) {
-      console.error("No token found.");
-      return;
-    }
-
     const res = await fetch(
       `https://docs.googleapis.com/v1/documents/${docId}:batchUpdate`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${latestToken}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(requestBody),
@@ -100,7 +109,7 @@ async function insertTextInGoogleDoc(docId, text, docLastIndex) {
           docId,
           docLastIndex: endIndex,
         };
-        chrome.storage.local.set({ selectedDocData: updatedData });
+        chrome.storage.local.set({ selectedDocData: updatedData }, () => {});
       });
     }
   } catch (error) {
@@ -114,7 +123,6 @@ chrome.contextMenus.onClicked.addListener((info) => {
 
   chrome.storage.local.get(["selectedDocData"], (result) => {
     docLastIndex = result.selectedDocData?.docLastIndex || 0;
-
     insertTextInGoogleDoc(currentDocId, info.selectionText, docLastIndex);
   });
 });
