@@ -5,16 +5,15 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import FileOpenIcon from "@mui/icons-material/FileOpen";
 import InputWithButton from "./InputWithButton";
-import AddIcon from '@mui/icons-material/Add';
+import AddIcon from "@mui/icons-material/Add";
 import { useAuth } from "../../context/AuthContext";
 
 /* global chrome */
-const SelectRecentDoc = ({ options, setOptions }) => {
+const SelectRecentDoc = ({ options, setOptions, selectedDoc, setSelectedDoc }) => {
   const { token } = useAuth();
-  const [selectedDoc, setSelectedDoc] = useState(null);
   const [docId, setDocId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [errorInfo, setErrorInfo] = useState({showError: false, message: ""});
+  const [errorInfo, setErrorInfo] = useState({ showError: false, message: "" });
 
   const fetchOptions = () => {
     chrome.storage.sync.get(["recentDocs"], (result) => {
@@ -48,8 +47,7 @@ const SelectRecentDoc = ({ options, setOptions }) => {
     } catch (error) {
       throw error;
     }
-  }
-    
+  };
 
   const handleAddDocWithId = async () => {
     if (!docId.trim()) {
@@ -57,7 +55,10 @@ const SelectRecentDoc = ({ options, setOptions }) => {
     }
 
     if ((options || []).find((option) => option.value === docId)) {
-      setErrorInfo({showError: true, message: "The document ID you entered already exists."});
+      setErrorInfo({
+        showError: true,
+        message: "The document ID you entered already exists.",
+      });
       return;
     }
 
@@ -67,9 +68,13 @@ const SelectRecentDoc = ({ options, setOptions }) => {
 
       if (!res.ok) {
         if (res.status === 404) {
-          throw new Error("The document ID you entered is incorrect or does not exist.");
+          throw new Error(
+            "The document ID you entered is incorrect or does not exist."
+          );
         } else {
-          throw new Error("Unable to fetch document. Please check your access and try again.");
+          throw new Error(
+            "Unable to fetch document. Please check your access and try again."
+          );
         }
       }
       setDocId("");
@@ -83,10 +88,10 @@ const SelectRecentDoc = ({ options, setOptions }) => {
         });
       });
     } catch (error) {
-      setErrorInfo({showError: true, message: error.message});
+      setErrorInfo({ showError: true, message: error.message });
     }
     setIsLoading(false);
-  }
+  };
 
   const handleOpenSelectedDoc = () => {
     if (selectedDoc) {
@@ -99,36 +104,42 @@ const SelectRecentDoc = ({ options, setOptions }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      setErrorInfo({showError: false, message: ""});
+      setErrorInfo({ showError: false, message: "" });
     }, 5000);
   }, [errorInfo.showError]);
 
-  const extractHeadings = (docData) => {
-    return docData?.body?.content
-      .filter((element) => element.paragraph?.paragraphStyle?.namedStyleType?.includes("HEADING"))
-      .map((element) => ({
-        text: element.paragraph.elements
-          ?.map((el) => el?.textRun?.content.trim())
-          ?.join(" "),
-        type: element?.paragraph?.paragraphStyle?.namedStyleType,
-        index: element?.startIndex,
-      }));
-  };
+  const getDocLastIndex = (docData) => {
+    const content = docData?.body?.content;
+
+    if (!content || content.length === 0) {
+      return 0;
+    }
+    return content[content.length - 1].endIndex - 1;
+  }
 
   const handleDropdownChange = async (event) => {
     setSelectedDoc(event.target.value);
-    chrome.storage.sync.set({ selectedDoc: event.target.value });
+    chrome.storage.local.set({ selectedDoc: event.target.value });
 
     const res = await fetchDocWithId(event.target.value);
     if (!res.ok) {
       return;
     }
     const docData = await res.json();
-    const headings = extractHeadings(docData);
-    chrome.storage.local.set(
-      { selectedDocData: { docId: event.target.value, headings } },
-      () => {}
-    );
+    const docLastIndex = getDocLastIndex(docData);
+
+    chrome.storage.local.get(["selectedDocData"], (result) => {
+      chrome.storage.local.set(
+        {
+          selectedDocData: {
+            ...result.selectedDocData,
+            docId: event.target.value,
+            docLastIndex,
+          },
+        },
+        () => {}
+      );
+    });
   };
 
   return (
@@ -158,16 +169,16 @@ const SelectRecentDoc = ({ options, setOptions }) => {
               errorInfo.message
             ) : (
               <span>
-                Find it in the Google Doc URL between <code>/d/</code> and <code>/edit</code>.
+                Find it in the Google Doc URL between <code>/d/</code> and{" "}
+                <code>/edit</code>.
               </span>
             )}
           </span>
         }
-        
         value={docId}
         onChange={(event) => setDocId(event.target.value)}
         isLoading={isLoading}
-        disabled={isLoading}
+        disabled={(isLoading || docId.trim() === "") ? true : false}
         icon={<AddIcon />}
         buttonText="Add"
         onClick={handleAddDocWithId}

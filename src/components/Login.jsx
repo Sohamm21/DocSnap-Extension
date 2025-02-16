@@ -10,6 +10,7 @@ const Login = () => {
         return;
       }
       setToken(token);
+      chrome.storage.local.set({ token });
     });
   };
 
