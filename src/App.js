@@ -32,7 +32,7 @@ const MainApp = () => {
         {token && <RefreshExtension setIsRefreshing={setIsRefreshing} />}
       </div>
       {isRefreshing ? (
-        <CircularProgress />
+        <div className="loader"><CircularProgress /></div>
       ) : !token ? (
         <Login />
       ) : (

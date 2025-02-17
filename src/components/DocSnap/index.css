@@ -153,3 +153,10 @@
   font-size: 15px;
   font-family: "Outfit" !important;
 }
+
+.loader {
+  height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
