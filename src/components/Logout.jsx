@@ -2,6 +2,7 @@ import React from "react";
 
 import { Button } from "@mui/material";
 import LogoutIcon from "@mui/icons-material/Logout";
+import HelpIcon from '@mui/icons-material/Help';
 
 import { useAuth } from "../context/AuthContext";
 
@@ -24,6 +25,7 @@ const Logout = () => {
 
   return (
     <div className="logout-button">
+      <span className="help-btn" onClick={() => {window.open('https://sohamm21.github.io/DocSnap-Extension/','_blank');}}><HelpIcon /></span>
       <Button
         variant="contained"
         sx={{

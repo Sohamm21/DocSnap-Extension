@@ -4,6 +4,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 
 import { useAuth } from "../../context/AuthContext";
+import { fetchDocWithId, getDocLastIndex } from "./utils";
 
 import "./index.css";
 
@@ -32,38 +33,11 @@ const SelectRecentDoc = ({
     });
   }, []);
 
-  const fetchDocWithId = async (id) => {
-    try {
-      const res = await fetch(
-        `https://docs.googleapis.com/v1/documents/${id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      return res;
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const getDocLastIndex = (docData) => {
-    const content = docData?.body?.content;
-
-    if (!content || content.length === 0) {
-      return 0;
-    }
-    return content[content.length - 1].endIndex - 1;
-  };
-
   const handleDropdownChange = async (event) => {
     setSelectedDoc(event.target.value);
     chrome.storage.local.set({ selectedDoc: event.target.value });
 
-    const res = await fetchDocWithId(event.target.value);
+    const res = await fetchDocWithId(event.target.value, token);
     if (!res.ok) {
       return;
     }

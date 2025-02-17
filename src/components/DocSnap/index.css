@@ -125,14 +125,19 @@
 
 .logout-button {
   display: flex;
-  flex-direction: row-reverse;
+  justify-content: space-between;
   margin-top: 20px;
+  align-items: center;
 }
 
 .logout-button button {
   height: 38px;
   font-size: 15px;
   font-family: "Outfit" !important;
+}
+
+.help-btn {
+  cursor: pointer;
 }
 
 .login-container {

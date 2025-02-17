@@ -1,5 +1,13 @@
 .header {
   height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-container {
+  position: absolute;
+  transform: translateX(60%);
 }
 
 .title {
@@ -15,11 +23,11 @@
 }
 
 .doc {
-  color: #1E90FF;
+  color: #1e90ff;
 }
 
 .snap {
-  color: #32CD32;
+  color: #32cd32;
 }
 
 .subtitle {
@@ -28,4 +36,10 @@
   font-family: "Outfit";
   font-style: italic;
   color: #a6a6a6;
+}
+
+.refresh-button {
+  margin-left: auto;
+  margin-top: 25px;
+  cursor: pointer;
 }
