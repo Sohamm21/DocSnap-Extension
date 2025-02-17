@@ -10,10 +10,10 @@ const RefreshExtension = ({ setIsRefreshing }) => {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    chrome.storage.local.get("selectedDoc", async (result) => {
-      if (result?.selectedDoc) {
+    chrome.storage.local.get("selectedDocData", async (result) => {
+      if (result?.selectedDocData?.docId) {
         try {
-          const res = await fetchDocWithId(result.selectedDoc, token);
+          const res = await fetchDocWithId(result?.selectedDocData?.docId, token);
           if (!res.ok) {
             setIsRefreshing(false);
             return;
@@ -26,7 +26,6 @@ const RefreshExtension = ({ setIsRefreshing }) => {
               {
                 selectedDocData: {
                   ...result.selectedDocData,
-                  docId: result?.selectedDoc,
                   docLastIndex,
                 },
               },

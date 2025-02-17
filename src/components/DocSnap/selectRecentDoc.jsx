@@ -26,17 +26,30 @@ const SelectRecentDoc = ({
 
   useEffect(() => {
     fetchOptions();
-    chrome.storage.local.get("selectedDoc", (result) => {
-      if (result?.selectedDoc) {
-        setSelectedDoc(result?.selectedDoc);
+    chrome.storage.local.get("selectedDocData", (result) => {
+      if (result?.selectedDocData?.docId) {
+        setSelectedDoc(result?.selectedDocData?.docId);
       }
     });
   }, []);
 
   const handleDropdownChange = async (event) => {
     setSelectedDoc(event.target.value);
-    chrome.storage.local.set({ selectedDoc: event.target.value });
+    chrome.storage.local.get(["selectedDocData"], (result) => {
+      chrome.storage.local.set(
+        {
+          selectedDocData: {
+            ...result.selectedDocData,
+            docId: event.target.value,
+          },
+        },
+        () => {}
+      );
+    });
 
+    if (!event.target.value) {
+      return;
+    }
     const res = await fetchDocWithId(event.target.value, token);
     if (!res.ok) {
       return;

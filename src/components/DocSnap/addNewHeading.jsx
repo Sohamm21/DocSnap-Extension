@@ -29,17 +29,9 @@ const AddNewHeading = ({ selectedDoc }) => {
       const requestBody = {
         requests: [
           {
-            deleteParagraphBullets: {
-              range: {
-                startIndex: docLastIndex,
-                endIndex: docLastIndex + 1,
-              },
-            },
-          },
-          {
             insertText: {
               location: { index: docLastIndex },
-              text: `\n${heading}\n`,
+              text: `\n${heading}`,
             },
           },
           {
@@ -52,8 +44,17 @@ const AddNewHeading = ({ selectedDoc }) => {
               fields: "namedStyleType",
             },
           },
+          {
+            deleteParagraphBullets: {
+              range: {
+                startIndex: docLastIndex + 1,
+                endIndex: docLastIndex + 1 + heading.length,
+              },
+            },
+          },
         ],
       };
+      
   
       const res = await fetch(
         `https://docs.googleapis.com/v1/documents/${selectedDoc}:batchUpdate`,

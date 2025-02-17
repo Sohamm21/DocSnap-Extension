@@ -6,13 +6,18 @@ let authToken = null;
 
 function createOrUpdateContextMenu() {
   chrome.contextMenus.removeAll(() => {
-    chrome.contextMenus.create({
-      id: "add-to-doc",
-      title: "Add to Doc",
-      contexts: ["selection"],
-    });
+    if (currentDocId) {
+      setTimeout(() => {
+        chrome.contextMenus.create({
+          id: "add-to-doc",
+          title: "Add to Doc",
+          contexts: ["selection"],
+        });
+      }, 50);
+    }
   });
 }
+
 
 chrome.storage.local.get(["token"], (result) => {
   authToken = result.token || null;
@@ -60,7 +65,12 @@ async function insertTextInGoogleDoc(docId, text, docLastIndex) {
       return;
     }
 
-    const newText = `\n${text}`;
+    let newText = "";
+    if (docLastIndex === 1) {
+      newText = text;
+    } else {
+      newText = `\n${text}`;
+    }
     const startIndex = docLastIndex;
     const endIndex = startIndex + newText.length;
 
@@ -119,6 +129,7 @@ async function insertTextInGoogleDoc(docId, text, docLastIndex) {
 
 // Handle context menu click
 chrome.contextMenus.onClicked.addListener((info) => {
+  console.log({currentDocId})
   if (!currentDocId || !info.selectionText) return;
 
   chrome.storage.local.get(["selectedDocData"], (result) => {
