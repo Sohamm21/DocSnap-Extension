@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import Button from "@mui/material/Button";
-import FileOpenIcon from "@mui/icons-material/FileOpen";
-import InputWithButton from "./InputWithButton";
-import AddIcon from "@mui/icons-material/Add";
+
 import { useAuth } from "../../context/AuthContext";
 
+import "./index.css";
+
 /* global chrome */
-const SelectRecentDoc = ({ options, setOptions, selectedDoc, setSelectedDoc }) => {
+const SelectRecentDoc = ({
+  options,
+  setOptions,
+  selectedDoc,
+  setSelectedDoc,
+}) => {
   const { token } = useAuth();
-  const [docId, setDocId] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorInfo, setErrorInfo] = useState({ showError: false, message: "" });
 
   const fetchOptions = () => {
     chrome.storage.sync.get(["recentDocs"], (result) => {
@@ -49,65 +50,6 @@ const SelectRecentDoc = ({ options, setOptions, selectedDoc, setSelectedDoc }) =
     }
   };
 
-  const handleAddDocWithId = async () => {
-    if (!docId.trim()) {
-      return;
-    }
-
-    if ((options || []).find((option) => option.value === docId)) {
-      setErrorInfo({
-        showError: true,
-        message: "The document ID you entered already exists.",
-      });
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const res = await fetchDocWithId(docId);
-
-      if (!res.ok) {
-        if (res.status === 404) {
-          throw new Error(
-            "The document ID you entered is incorrect or does not exist."
-          );
-        } else {
-          throw new Error(
-            "Unable to fetch document. Please check your access and try again."
-          );
-        }
-      }
-      setDocId("");
-      const docData = await res.json();
-      const newDoc = { value: docData?.documentId, label: docData?.title };
-      chrome.storage.sync.get(["recentDocs"], (result) => {
-        const existingDocs = result.recentDocs || [];
-        const updatedDocs = [newDoc, ...existingDocs].slice(0, 5);
-        chrome.storage.sync.set({ recentDocs: updatedDocs }, () => {
-          setOptions(updatedDocs);
-        });
-      });
-    } catch (error) {
-      setErrorInfo({ showError: true, message: error.message });
-    }
-    setIsLoading(false);
-  };
-
-  const handleOpenSelectedDoc = () => {
-    if (selectedDoc) {
-      window.open(
-        `https://docs.google.com/document/d/${selectedDoc}/edit`,
-        "_blank"
-      );
-    }
-  };
-
-  useEffect(() => {
-    setTimeout(() => {
-      setErrorInfo({ showError: false, message: "" });
-    }, 5000);
-  }, [errorInfo.showError]);
-
   const getDocLastIndex = (docData) => {
     const content = docData?.body?.content;
 
@@ -115,7 +57,7 @@ const SelectRecentDoc = ({ options, setOptions, selectedDoc, setSelectedDoc }) =
       return 0;
     }
     return content[content.length - 1].endIndex - 1;
-  }
+  };
 
   const handleDropdownChange = async (event) => {
     setSelectedDoc(event.target.value);
@@ -143,56 +85,92 @@ const SelectRecentDoc = ({ options, setOptions, selectedDoc, setSelectedDoc }) =
   };
 
   return (
-    <>
-      <span>Doc To Use:</span>
+    <div className="select-recent-doc">
+      <span className="recent-doc-label">Select Doc:</span>
       <Select
         value={selectedDoc}
         onChange={handleDropdownChange}
         displayEmpty
         inputProps={{ "aria-label": "Without label" }}
+        className="recent-doc-dropdown"
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              backgroundColor: "#696969",
+              color: "#FFFFFF",
+              boxShadow: "0px 4px 10px rgba(0,0,0,0.5)",
+              borderRadius: "8px",
+            },
+          },
+          MenuListProps: {
+            sx: {
+              backgroundColor: "#121212",
+              padding: 0,
+            },
+          },
+        }}
+        sx={{
+          backgroundColor: "#333",
+          color: "#bababa",
+          height: "38px",
+          "& .MuiSvgIcon-root": { color: "#fff" },
+          "& .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#696969",
+            transition: "border-color 0.3s ease-in-out",
+          },
+          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#555 !important",
+          },
+          "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#9a9a9a",
+          },
+        }}
       >
-        <MenuItem value={null}>
+        <MenuItem
+          value={null}
+          className="recent-doc-option-menu"
+          sx={{
+            backgroundColor: "#121212",
+            color: "#fff",
+            "&:hover": {
+              backgroundColor: "#1e1e1e",
+            },
+            "&.Mui-selected": {
+              backgroundColor: "#2a2a2a",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "#3a3a3a",
+              },
+            },
+          }}
+        >
           <em>None</em>
         </MenuItem>
         {options.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
+          <MenuItem
+            key={option.value}
+            value={option.value}
+            className="recent-doc-option-menu"
+            sx={{
+              backgroundColor: "#121212",
+              color: "#fff",
+              "&:hover": {
+                backgroundColor: "#1e1e1e",
+              },
+              "&.Mui-selected": {
+                backgroundColor: "#2a2a2a",
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: "#3a3a3a",
+                },
+              },
+            }}
+          >
             {option.label}
           </MenuItem>
         ))}
       </Select>
-      <InputWithButton
-        label="Enter Doc Id"
-        showError={errorInfo.showError}
-        helperText={
-          <span>
-            {errorInfo.showError ? (
-              errorInfo.message
-            ) : (
-              <span>
-                Find it in the Google Doc URL between <code>/d/</code> and{" "}
-                <code>/edit</code>.
-              </span>
-            )}
-          </span>
-        }
-        value={docId}
-        onChange={(event) => setDocId(event.target.value)}
-        isLoading={isLoading}
-        disabled={(isLoading || docId.trim() === "") ? true : false}
-        icon={<AddIcon />}
-        buttonText="Add"
-        onClick={handleAddDocWithId}
-      />
-      <Button
-        variant="contained"
-        sx={{ textTransform: "none" }}
-        startIcon={<FileOpenIcon />}
-        onClick={handleOpenSelectedDoc}
-        disabled={!selectedDoc}
-      >
-        Open Selected Doc
-      </Button>
-    </>
+    </div>
   );
 };
 

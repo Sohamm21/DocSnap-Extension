@@ -6,6 +6,8 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import { useAuth } from "../../context/AuthContext";
 import InputWithButton from "./InputWithButton";
 
+import "./index.css";
+
 /* global chrome */
 const CreateNewDoc = ({ setOptions }) => {
   const { token } = useAuth();
@@ -54,6 +56,8 @@ const CreateNewDoc = ({ setOptions }) => {
   const renderInputWithButton = () => {
     return (
       <InputWithButton
+        inputClassName="doc-id-input"
+        buttonClassName="doc-id-button"
         isRequired
         showError={showError}
         label="Enter Doc Name"
@@ -78,6 +82,7 @@ const CreateNewDoc = ({ setOptions }) => {
         variant="contained"
         startIcon={<NoteAddIcon />}
         onClick={() => setIsCreatingDoc(true)}
+        className="create-new-doc-button"
       >
         Create New Doc
       </Button>

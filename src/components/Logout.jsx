@@ -1,5 +1,11 @@
 import React from "react";
+
+import { Button } from "@mui/material";
+import LogoutIcon from "@mui/icons-material/Logout";
+
 import { useAuth } from "../context/AuthContext";
+
+import "./DocSnap/index.css";
 
 /* global chrome */
 const Logout = () => {
@@ -17,8 +23,18 @@ const Logout = () => {
   };
 
   return (
-    <div>
-      <button onClick={handleLogout}>Logout</button>
+    <div className="logout-button">
+      <Button
+        variant="contained"
+        sx={{
+          textTransform: "none",
+        }}
+        onClick={handleLogout}
+        color="error"
+        startIcon={<LogoutIcon />}
+      >
+        Sign Out
+      </Button>
     </div>
   );
 };

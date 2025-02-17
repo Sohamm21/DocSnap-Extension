@@ -16,10 +16,16 @@ const App = () => {
 const MainApp = () => {
   const { token } = useAuth();
   return (
-    <div>
-      <h1>DocSnap</h1>
+    <>
+      <div className="header">
+        <h1 className="title">
+          <span className="doc">Doc</span>
+          <span className="snap">Snap</span>
+        </h1>
+        <span className="subtitle">Quickly add notes to your Docs</span>
+      </div>
       {!token ? <Login /> : <DocSnapWrapper />}
-    </div>
+    </>
   );
 };
 

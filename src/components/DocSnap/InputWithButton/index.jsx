@@ -14,10 +14,20 @@ const InputWithButton = ({
   onChange,
   helperText,
   label,
+  inputClassName,
+  buttonClassName,
+  disabled,
 }) => {
   return (
-    <div>
+    <div className="input-with-button">
       <TextField
+        size="small"
+        sx={{
+          '& .MuiInputLabel-root.Mui-focused': {
+          color: 'white',
+        },
+        }}
+        autoComplete="off"
         required={isRequired}
         error={showError}
         helperText={helperText}
@@ -26,14 +36,22 @@ const InputWithButton = ({
         variant="outlined"
         value={value}
         onChange={onChange}
+        className={inputClassName}
       />
       <Button
-        sx={{ textTransform: "none" }}
+        sx={{
+          textTransform: "none",
+          "&.Mui-disabled": {
+            cursor: "not-allowed",
+            pointerEvents: "auto",
+          },
+        }}
         loading={isLoading}
-        disabled={isLoading}
+        disabled={disabled}
         variant="contained"
         startIcon={icon}
         onClick={onClick}
+        className={buttonClassName}
       >
         {buttonText}
       </Button>

@@ -7,7 +7,6 @@ import { useAuth } from "../../context/AuthContext";
 const AddNewHeading = ({ selectedDoc }) => {
   const [heading, setHeading] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [showError, setShowError] = useState(false);
   const { token } = useAuth();
 
   const getDocLastIndex = () => {
@@ -20,10 +19,8 @@ const AddNewHeading = ({ selectedDoc }) => {
 
   const handleAddNewHeading = async () => {
     if (!heading.trim()) {
-      setShowError(true);
       return;
     }
-    setShowError(false);
     setIsLoading(true);
   
     try {
@@ -96,10 +93,15 @@ const AddNewHeading = ({ selectedDoc }) => {
 
   return (
     <InputWithButton
-      isRequired
-      showError={showError}
+      inputClassName="doc-id-input"
+      buttonClassName="doc-id-button"
       label="Enter Heading"
-      helperText={showError ? "Enter a valid heading" : ""}
+      helperText={
+        <>
+          <span>Adds a new heading to the doc.</span> <br />
+          <span><b>Note: </b>New points will be added below it.</span>
+        </>
+      }      
       value={heading}
       onChange={(event) => setHeading(event.target.value)}
       isLoading={isLoading}

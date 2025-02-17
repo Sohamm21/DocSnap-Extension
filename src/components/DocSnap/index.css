@@ -1,0 +1,150 @@
+.select-recent-doc {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.recent-doc-label {
+  font-family: "Outfit";
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.recent-doc-dropdown {
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.recent-doc-dropdown .MuiSelect-select {
+  font-family: "Outfit" !important;
+  font-size: 15px !important;
+  height: 40px;
+  padding: 5px 25px 5px 10px;
+  text-overflow: ellipsis;
+}
+
+.recent-doc-option-menu {
+  font-size: 15px !important;
+  font-family: "Outfit" !important;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.input-with-button .MuiFormControl-root {
+  flex-grow: 1;
+}
+
+.doc-id-input .MuiOutlinedInput-input {
+  height: 100%;
+  padding: 10px 14px;
+  line-height: 1.5;
+}
+
+.doc-id-input .MuiInputLabel-formControl {
+  font-size: 15px;
+  font-family: "Outfit";
+  color: #bababa;
+}
+
+.doc-id-input .MuiOutlinedInput-notchedOutline {
+  border-color: #696969;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.doc-id-input .Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #555 !important;
+}
+
+.doc-id-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: #9a9a9a !important;
+}
+
+.doc-id-input .MuiInputBase-root {
+  color: #bababa;
+}
+
+.doc-id-input .MuiFormHelperText-root {
+  margin: 5px 0px;
+  line-height: 1.2;
+  color: #9a9a9a;
+  font-size: 10px;
+  letter-spacing: 0.0333em;
+  font-style: italic;
+}
+
+.doc-id-button {
+  height: 38px;
+  font-family: "Outfit";
+  font-size: 15px;
+}
+
+.input-with-button .MuiButtonBase-root {
+  font-family: "Outfit" !important;
+}
+
+.input-with-button .Mui-disabled {
+  background-color: rgb(105, 105, 105, 0.5) !important;
+  color: rgb(255, 255, 255, 0.5) !important;
+}
+
+.doc-id-button .MuiButton-startIcon {
+  margin-right: 2px;
+}
+
+.doc-id-button .MuiButton-startIcon svg {
+  font-size: 15px;
+}
+
+.open-selected-doc-button {
+  height: 38px;
+  width: 100%;
+  margin-bottom: 15px !important;
+  font-size: 15px;
+  font-family: "Outfit" !important;
+}
+
+.open-selected-doc-button.Mui-disabled {
+  border-color: rgb(255, 255, 255, 0.5) !important;
+  color: rgb(255, 255, 255, 0.5) !important;
+}
+
+.create-new-doc-button {
+  height: 38px;
+  width: 100%;
+  margin-bottom: 15px !important;
+  font-size: 15px;
+  font-family: "Outfit" !important;
+}
+
+.logout-button {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 20px;
+}
+
+.logout-button button {
+  height: 38px;
+  font-size: 15px;
+  font-family: "Outfit" !important;
+}
+
+.login-container {
+  flex-grow: 1; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+
+.login-button {
+  height: 38px;
+  font-size: 15px;
+  font-family: "Outfit" !important;
+}
