@@ -11,7 +11,7 @@ const AddDoc = ({ options, setOptions }) => {
   const [docId, setDocId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState({ showError: false, message: "" });
-  const { token } = useAuth();
+  const { token, setToken } = useAuth();
 
   useEffect(() => {
     setTimeout(() => {
@@ -59,6 +59,8 @@ const AddDoc = ({ options, setOptions }) => {
           throw new Error(
             "The document ID you entered is incorrect or does not exist."
           );
+        } else if (res.status === 401) {
+          throw new Error("UNAUTHENTICATED");
         } else {
           throw new Error(
             "Unable to fetch document. Please check your access and try again."
@@ -76,7 +78,12 @@ const AddDoc = ({ options, setOptions }) => {
         });
       });
     } catch (error) {
-      setErrorInfo({ showError: true, message: error.message });
+      if (error.message === "UNAUTHENTICATED") {
+        chrome.identity.removeCachedAuthToken({ token }, () => {});
+        setToken(null);
+      } else {
+        setErrorInfo({ showError: true, message: error.message });
+      }
     }
     setIsLoading(false);
   };

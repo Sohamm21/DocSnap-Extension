@@ -7,7 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 const AddNewHeading = ({ selectedDoc }) => {
   const [heading, setHeading] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { token } = useAuth();
+  const { token, setToken } = useAuth();
 
   const getDocLastIndex = () => {
     return new Promise((resolve) => {
@@ -22,10 +22,18 @@ const AddNewHeading = ({ selectedDoc }) => {
       return;
     }
     setIsLoading(true);
-  
+
     try {
-      const docLastIndex = await getDocLastIndex();
-  
+      let docLastIndex;
+      try {
+        docLastIndex = await getDocLastIndex();
+      } catch (error) {
+        if (error.response?.status === 401) {
+          throw new Error("UNAUTHENTICATED");
+        }
+        throw error;
+      }
+
       const requestBody = {
         requests: [
           {
@@ -54,8 +62,7 @@ const AddNewHeading = ({ selectedDoc }) => {
           },
         ],
       };
-      
-  
+
       const res = await fetch(
         `https://docs.googleapis.com/v1/documents/${selectedDoc}:batchUpdate`,
         {
@@ -67,11 +74,11 @@ const AddNewHeading = ({ selectedDoc }) => {
           body: JSON.stringify(requestBody),
         }
       );
-  
+
       if (!res.ok) {
         throw new Error("Failed to insert text");
       }
-  
+
       const updatedDocLastIndex = docLastIndex + heading.length + 1;
       chrome.storage.local.get(["selectedDocData"], (result) => {
         const updatedData = {
@@ -81,16 +88,18 @@ const AddNewHeading = ({ selectedDoc }) => {
         };
         chrome.storage.local.set({ selectedDocData: updatedData });
       });
-  
+
       setHeading("");
     } catch (error) {
+      if (error.message === "UNAUTHENTICATED") {
+        chrome.identity.removeCachedAuthToken({ token }, () => {});
+        setToken(null);
+      }
       console.error("Error inserting text:", error);
     } finally {
       setIsLoading(false);
     }
   };
-  
-  
 
   return (
     <InputWithButton
@@ -100,9 +109,11 @@ const AddNewHeading = ({ selectedDoc }) => {
       helperText={
         <>
           <span>Adds a new heading to the doc.</span> <br />
-          <span><b>Note: </b>New points will be added below it.</span>
+          <span>
+            <b>Note: </b>New points will be added below it.
+          </span>
         </>
-      }      
+      }
       value={heading}
       onChange={(event) => setHeading(event.target.value)}
       isLoading={isLoading}

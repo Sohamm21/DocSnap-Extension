@@ -15,6 +15,7 @@ const Logout = () => {
     if (token) {
       chrome.identity.removeCachedAuthToken({ token }, () => {
         setToken(null);
+        chrome.runtime.sendMessage({ action: "logout" });
       });
 
       fetch(`https://accounts.google.com/o/oauth2/revoke?token=${token}`)

@@ -6,7 +6,7 @@ let authToken = null;
 
 function createOrUpdateContextMenu() {
   chrome.contextMenus.removeAll(() => {
-    if (currentDocId) {
+    if (currentDocId && authToken) {
       setTimeout(() => {
         chrome.contextMenus.create({
           id: "add-to-doc",
@@ -18,7 +18,6 @@ function createOrUpdateContextMenu() {
   });
 }
 
-
 chrome.storage.local.get(["token"], (result) => {
   authToken = result.token || null;
 });
@@ -27,6 +26,7 @@ chrome.storage.local.get(["token"], (result) => {
 chrome.storage.onChanged.addListener((changes) => {
   if (changes.token) {
     authToken = changes.token.newValue || null;
+    createOrUpdateContextMenu();
   }
 });
 
@@ -129,11 +129,29 @@ async function insertTextInGoogleDoc(docId, text, docLastIndex) {
 
 // Handle context menu click
 chrome.contextMenus.onClicked.addListener((info) => {
-  console.log({currentDocId})
   if (!currentDocId || !info.selectionText) return;
 
   chrome.storage.local.get(["selectedDocData"], (result) => {
     docLastIndex = result.selectedDocData?.docLastIndex || 0;
     insertTextInGoogleDoc(currentDocId, info.selectionText, docLastIndex);
   });
+});
+
+chrome.runtime.onMessage.addListener((message) => {
+  console.log("Received message:", message);
+  if (message.action === "logout") {
+    chrome.storage.local.set({ token: null }, () => {
+      chrome.storage.local.get(["selectedDocData"], (result) => {
+        chrome.storage.local.set(
+          {
+            selectedDocData: {
+              ...result.selectedDocData,
+              docId: null,
+            },
+          },
+          () => {}
+        );
+      });
+    });
+  }
 });
