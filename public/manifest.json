@@ -11,7 +11,7 @@
     "48": "logo.png",
     "128": "logo.png"
   },
-  "permissions": ["storage", "identity", "scripting", "contextMenus"],
+  "permissions": ["storage", "identity", "contextMenus"],
   "host_permissions": ["https://docs.google.com/document/*"],
   "background": {
     "service_worker": "background.js"
