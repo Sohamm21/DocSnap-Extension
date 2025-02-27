@@ -7,7 +7,6 @@
 }
 
 .recent-doc-label {
-  font-family: "Outfit";
   font-size: 15px;
   flex-shrink: 0;
 }
@@ -49,7 +48,6 @@
 
 .doc-id-input .MuiInputLabel-formControl {
   font-size: 15px;
-  font-family: "Outfit";
   color: #bababa;
 }
 
@@ -81,7 +79,6 @@
 
 .doc-id-button {
   height: 38px;
-  font-family: "Outfit";
   font-size: 15px;
 }
 
@@ -141,11 +138,18 @@
 }
 
 .login-container {
-  flex-grow: 1; 
+  flex-grow: 1;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 50vh;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.privacy-policy-link {
+  color: #1e90ff;
+  font-weight: bold;
 }
 
 .login-button {

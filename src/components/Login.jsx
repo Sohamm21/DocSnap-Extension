@@ -30,15 +30,28 @@ const Login = () => {
           <CircularProgress />
         </div>
       ) : (
-        <Button
-          onClick={handleLogin}
-          variant="contained"
-          startIcon={<GoogleIcon />}
-          sx={{ textTransform: "none" }}
-          className="login-button"
-        >
-          Sign in with Google
-        </Button>
+        <>
+          <Button
+            onClick={handleLogin}
+            variant="contained"
+            startIcon={<GoogleIcon />}
+            sx={{ textTransform: "none" }}
+            className="login-button"
+          >
+            Sign in with Google
+          </Button>
+          <span>
+            By clicking Sign in with Google, you agree to the{" "}
+            <a
+              href="https://sohamm21.github.io/DocSnap-Extension/privacy-policy.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="privacy-policy-link"
+            >
+              Privacy Policy
+            </a>
+          </span>
+        </>
       )}
     </div>
   );
