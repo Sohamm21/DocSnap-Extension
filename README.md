@@ -40,5 +40,13 @@ You can add content to your document by selecting any text on a webpage. Once se
 
 ### **2. Add New Heading**
 - You can new heading from the extension itself and it will start adding bullet points under the given heading.
+
+---
+
+
+## **Privacy Policy**
+
+[Privacy Policy](privacy-policy.md)
+
 ---
 
